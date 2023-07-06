@@ -15,7 +15,7 @@ router.get('/:id',[
 
 router.post('/',[
     check('nombre','The name is required').not().isEmpty(),
-    check('correo','The email is required').isEmail(),
+    check('correo','The email is not accepted').isEmail(),
     check('password', 'The password is required').isLength({min:6}),
     check('correo').custom(userExistEmail),
     check('rol').custom(existRole),

@@ -2,11 +2,11 @@ const bcryptjs = require('bcryptjs');
 const { generateJWT } = require('../helpers/generate-jwt');
 const User = require("../models/user");
 const { reponse, request } = require('express');
-
+const ResponseApi = require('../helpers/reponse-Api')
 
 
 const login = async  (req=request, res = reponse) => {
-
+    
     const {password , correo} = req.body;
     try {
 

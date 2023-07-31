@@ -1,74 +1,94 @@
 const User = require('../models/user');
 const bcryptjs = require("bcryptjs");
+const Api = require('../helpers/reponse-Api')
 
 
 
-const getUser = async(req, res) =>{
+const getUser = async (req, res) => {
+    const responseApi = new Api()
     try {
-        const {desde = 0, limite=5} = req.query;
+        const { desde = 0, limite = 5 } = req.query;
 
-        const query = {estado:true}
-    
+        const query = { estado: true }
+
         const [total, user] = await Promise.all([
             User.find(query).count(),
             User.find(query)
                 .limit(Number(limite))
                 .skip(Number(desde))
         ]);
-    
-        res.json({
-            total,
-            user
-        })
+        if (total === 0) {
+            responseApi.setState("200", "success", "Users not found")
+            responseApi.setResult({ total, user })
+        } else {
+            responseApi.setState("200", "success", "Users found")
+            responseApi.setResult({ total, user })
+        }
     } catch (error) {
-        throw new Error('Error en el servidor', error)
+        responseApi.setState("500", "error", "Request Failed");
+        responseApi.setResult(error);
+
     }
- 
+    res.json(responseApi.toResponse());
 }
 
-const getUserById = async(req, res) =>{
-    const {id} = req.params;
+const getUserById = async (req, res) => {
+    const responseApi = new Api()
+
+    const { id } = req.params;
     const user = await User.findById(id);
-    (user)?res.json(user): Error(`User with id${id} not found`);
-    
+    (user) ? responseApi.setResult(user) : responseApi.setState("404", "error", "User with id${id} not found");
+    res.json(responseApi.toResponse());
 }
 
-const createUser = async(req, res) => {
+const createUser = async (req, res) => {
+    const responseApi = new Api()
+    const { nombre, password, rol, correo } = req.body;
 
-    const {nombre, password, rol, correo} = req.body;
-
-    const user = new User({nombre,correo,rol,password});
+    const user = new User({ nombre, correo, rol, password });
 
     const salt = bcryptjs.genSaltSync();
-    user.password = bcryptjs.hashSync(password,salt);
+    user.password = bcryptjs.hashSync(password, salt);
 
     user.save();
-    res.status(201).json(user);
+
+    responseApi.setState("201", "success", "User created successfully")
+    responseApi.setResult(user)
+
+    res.json(responseApi.toResponse());
 }
 
-const updateUser = async(req, res) => {
+const updateUser = async (req, res) => {
+    const responseApi = new Api()
 
-    const {id} = req.params;
-    const {_id, google, password, ...resto} = req.body;
+    const { id } = req.params;
+    const { _id, google, password, ...resto } = req.body;
 
-    if(password){
+    if (password) {
         const salt = bcryptjs.genSaltSync();
-    resto.password = bcryptjs.hashSync(password,salt);
+        resto.password = bcryptjs.hashSync(password, salt);
     }
 
-    const user = await User.findByIdAndUpdate(id, resto, {new:true});
+    const user = await User.findByIdAndUpdate(id, resto, { new: true });
     await user.save();
 
-    res.json(user)
+    responseApi.setState("201", "success", "User updated successfully")
+    responseApi.setResult(user)
+
+    res.json(responseApi.toResponse());
 }
 
-const deleteUser = async(req,res) => {
+const deleteUser = async (req, res) => {
+    const responseApi = new Api()
 
-    const {id} = req.params;
+    const { id } = req.params;
 
-    const usuario = await User.findByIdAndUpdate(id,{estado:false}, {new:true});
+    const user = await User.findByIdAndUpdate(id, { estado: false }, { new: true });
 
-    res.json(usuario)
+    responseApi.setState("201", "success", "User deleted successfully")
+    responseApi.setResult(user)
+
+    res.json(responseApi.toResponse());
 }
 
 module.exports = {

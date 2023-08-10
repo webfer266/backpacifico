@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const {dbConnection} = require('../database/config');
+const fileUpload = require('express-fileupload');
 
 
 class Server {
@@ -12,7 +13,10 @@ class Server {
         
         this.paths = {
             auth: '/api/auth',
-            user: '/api/user'
+            user: '/api/user',
+            answerO: '/api/answerObservation',
+            answerQ:'/api/questionObservation',
+            result: '/api/questionsAnswers'
         }
 
         // Connect the database
@@ -37,12 +41,20 @@ class Server {
         //Parsing and reading the body
         this.app.use(express.json());
 
+        this.app.use(fileUpload({
+            useTempFiles: true,
+            tempFileDir:'/tmp/'
+        }))
+
     }
 
     routes(){
         //ENDPOINT
         this.app.use(this.paths.auth, require('../routes/auth'));
         this.app.use(this.paths.user, require('../routes/user'));
+        this.app.use(this.paths.answerO, require('../routes/answerObservation'));
+        this.app.use(this.paths.answerQ, require('../routes/questionObservation'));
+        this.app.use(this.paths.result, require('../routes/questionAnswerObs'));
     }
 
     listen(){

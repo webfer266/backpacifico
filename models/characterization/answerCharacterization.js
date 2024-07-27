@@ -1,12 +1,12 @@
 const {Schema, model, mongoose} = require('mongoose')
 
-const answerObservation = Schema({
+const answerCharacterizations = Schema({
 
     idAnswer:{
         type: Number,
         required:true,
     },
-    idQuestionCsv:{
+    idQuestionRef:{
         type: Number,
         required:true,
     },
@@ -17,4 +17,4 @@ const answerObservation = Schema({
     }
 
 })
-module.exports= model('answerObservations',answerObservation)
+module.exports= model('answerCharacterizations',answerCharacterizations)

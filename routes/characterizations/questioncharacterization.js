@@ -1,6 +1,6 @@
-const {getQuestion,postQuestion,updateQuestion,deleteQuestion} = require('../controller/observations/questionObservation');
+const {getQuestion,postQuestion,updateQuestion,deleteQuestion} = require('../../controller/characterizations/questionCharacterization');
 const { check } = require('express-validator');
-const {validateFields} = require('../middlewares/validate-fields');
+const {validateFields} = require('../../middlewares/validate-fields');
 // const {idAnswerExistObser} = require('../helpers/db-validators-question-obser')
 const { Router } = require('express');
 

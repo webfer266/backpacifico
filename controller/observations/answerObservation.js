@@ -1,9 +1,6 @@
-const AnswerObservation= require('../models/answerObservation');
-const Api = require('../helpers/reponse-Api')
-const {readFileSync} = require('fs');
-const path = require('path');
-const {parse} = require('csv-parse/sync');
-const { subirArchivo } = require('../helpers/upload');
+const AnswerObservation= require('../../models/observations/answerObservation');
+const Api = require('../../helpers/reponse-Api')
+
 
 
 
@@ -12,7 +9,7 @@ const getAnswer = async (req, res) => {
     try {
         const [total,answer]=await Promise.all([
             AnswerObservation.countDocuments(),
-            AnswerObservation.find().populate('questionRef')
+            AnswerObservation.find()
         ]);
 
         if (total === 0) {
@@ -31,35 +28,17 @@ const getAnswer = async (req, res) => {
 
 }
 
-const postAnswer = (req,res) => {
-    res.json('hola desde')
-}
+const postAnswer =async (req,res) => {
+    const responseApi = new Api()
 
-const upload= async (req,res) => {
-    if (!req.files || Object.keys(req.files).length === 0 || !req.files.archivo) {
-        res.status(400).json({msg: 'no files were uploaded'})
-        return;
-    }
-    const pathCompleto=await subirArchivo(req.files)
+    const {idAnswer,idQuestionRef,nameOpcion} = req.body;
+    const answer =await new AnswerObservation({idAnswer,idQuestionRef,nameOpcion})
+    answer.save();
 
-    //archivo en base de datos
+    responseApi.setState("201", "success", "Answer created successfully")
+    responseApi.setResult(answer)
 
-    const patloading=path.join(__dirname,'../public/uploads',`${pathCompleto}`)
-    const fileContent =readFileSync(patloading,'utf-8')
-    const csvContent=await parse(fileContent,{
-        columns:['idAnswer','idQuestionCsv','nameOpcion'],
-        delimiter:[';',',']
-    });
-
-
-    for (let index = 0; index < csvContent.length; index++) {
-        
-            const {idAnswer,idQuestionCsv,nameOpcion}=await csvContent[index];  
-                    const answer = new AnswerObservation({idAnswer,idQuestionCsv,nameOpcion})
-                    answer.save();
-    }
-    res.json({msg:'archivo subido'})
-  
+    res.json(responseApi.toResponse());
 }
 
 const updateAnswer = async (req,res) => {
@@ -91,5 +70,4 @@ module.exports= {
     postAnswer,
     updateAnswer,
     deleteAnswer,
-    upload
 }

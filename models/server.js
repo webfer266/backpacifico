@@ -15,8 +15,15 @@ class Server {
             auth: '/api/auth',
             user: '/api/user',
             answerO: '/api/answerObservation',
-            answerQ:'/api/questionObservation',
-            result: '/api/questionsAnswers'
+            questionO:'/api/questionObservation',
+            answerC:'/api/answerCharacterization',
+            questionC:'/api/questionCharacterization',
+            obsevation: '/api/questionsAnswersO',
+            Characterization: '/api/questionsAnswersC',
+            uploadAnswerO:'/api/uploadAnsO',
+            uploadQuestionO:'/api/uploadQuesO',
+            uploadAnswerC:'/api/uploadAnsC',
+            uploadQuestionC:'/api/uploadQuesC',
         }
 
         // Connect the database
@@ -46,6 +53,12 @@ class Server {
             tempFileDir:'/tmp/'
         }))
 
+        this.app.use(fileUpload({
+            useTempFiles: true,
+            tempFileDir:'/tmp/',
+            createParentPath: true
+        }))
+
     }
 
     routes(){
@@ -53,8 +66,16 @@ class Server {
         this.app.use(this.paths.auth, require('../routes/auth'));
         this.app.use(this.paths.user, require('../routes/user'));
         this.app.use(this.paths.answerO, require('../routes/answerObservation'));
-        this.app.use(this.paths.answerQ, require('../routes/questionObservation'));
-        this.app.use(this.paths.result, require('../routes/questionAnswerObs'));
+        this.app.use(this.paths.questionO, require('../routes/questionObservation'));
+        this.app.use(this.paths.obsevation, require('../routes/questionAnswerObs'));
+        this.app.use(this.paths.uploadAnswerO, require('../routes/uploadAnswersO'));
+        this.app.use(this.paths.uploadQuestionO, require('../routes/uploadQuestionO'));
+        this.app.use(this.paths.answerC, require('../routes/characterizations/answerCharacterization'));
+        this.app.use(this.paths.uploadAnswerC, require('../routes/characterizations/uploadAnswersC'));
+        this.app.use(this.paths.questionC, require('../routes/characterizations/questioncharacterization'));
+        this.app.use(this.paths.uploadQuestionC, require('../routes/characterizations/uploadQuestionC'));
+        this.app.use(this.paths.Characterization, require('../routes/characterizations/questionAnswerCha'));
+        
     }
 
     listen(){

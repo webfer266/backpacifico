@@ -1,9 +1,9 @@
 const {getAnswer,
     postAnswer,
     updateAnswer,
-    deleteAnswer} = require('../controller/observations/answerObservation');
+    deleteAnswer} = require('../../controller/characterizations/answerCharacterization');
 const { check } = require('express-validator');
-const {validateFields} = require('../middlewares/validate-fields');
+const {validateFields} = require('../../middlewares/validate-fields');
 // const {idAnswerExistObser} = require('../helpers/db-validators-answer-obser')
 const { Router } = require('express');
 
